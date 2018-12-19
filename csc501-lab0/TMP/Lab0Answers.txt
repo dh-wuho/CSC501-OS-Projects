@@ -1,0 +1,74 @@
+1, Assuming the XINU text begins at address 0x0, draw a rough diagram of XINU's memory layout with addresses derived from your experimental measurements. Include the information you uncovered from running your version of printsegaddress() and printprocstks().
+
+|					|
+|___________________| ________> prnull base 0x00fffffc
+|					| 	
+|	 	prnull		| ________> prnull sp 0x00ffff2c
+|___________________| ________> prunull limit 0x00fff000
+|___________________| ________> main base 0x00ffeff8
+|					|
+|		main		| ________> main sp 0x00ffef90
+|___________________| ________> main limit 0x00ffdffc
+|					|
+|		stack		|
+|_ _ _ _ _ _ _ _ _ _|
+|		  |			|
+|		  |			|
+|		 \|/		|
+|					|
+|					|
+|					|
+|		 /|\		|
+|		  |			|
+|_ _ _ _ _|_ _ _ _ _|
+|					|
+|		heap		|
+|___________________| ________>	0x00026cb8
+|					|
+|		 end		|
+|___________________| ________> 0x0001e53d
+|					|
+|		edata		|
+|___________________| ________> 0x000194ad
+|					|
+|		etext		|
+|___________________| ________> 0x00000000
+
+
+2, What is the difference in stack top address before and after calling printtos()? Draw a diagram to illustrate what are the contents of the items pushed into the stack between these two time points.
+
+Generally, when calling printtos(), the process will push the parameters of this function into the stack. But in this case, there is no parameters, so the diagram is as follow:
+
+|___________________| ________> 0x00ffeff4 -> top of stack before printtos() function
+|					|
+|	Return Address 	|
+|___________________| 
+|					|
+|	   Old ebp		|
+|___________________| ________> 0x00ffefec -> top of stack after printtos() function
+|					|
+
+3, In a stack frame, local variables are stored below the top of the stack. In task 3, does your result show all the local variables declared in your printtos function? If not, can you explain that? (hint: try to disable the compiler optimization by specifing -O0 in your Makefile)
+
+My result doesn't show all the local variables declared in my printtos function. I searched on Google, and I figure out that to create a new stack frame, the called program pushes the old EBP onto the stack and then loads the EBP with the current stack point, ESP. It then drops the stack pointer by the number of bytes needed in the stack frame, which is determined by the compiler, and how the compiler has laid out and allocated the local variables. In other words, if I add -O0 into Makefile, the printtos() will show the expected address. Because with -O0, the compiler won't optimize the code, and I can get the expected address and contents. Actually, when I put -O0 into Makefile, I didn't get expected display. I guess maybe I put -O0 into wrong place of Makefile. I still don't why. Here is the display with -O0 and without -O0. 
+
+Ref: http://www.cs.miami.edu/home/burt/learning/Csc421.171/workbook/stack-memory.html
+
+/* with -O0 */
+void printtos()
+Before[0x00ffefb0]: 0x0001cb80
+After [0x00ffefa8]: 0x00ffefec
+	element[0x00ffef80]: 0x0001d469
+	element[0x00ffef84]: 0x00ffef80
+	element[0x00ffef88]: 0x00ffef80
+	element[0x00ffef8c]: 0x00021544
+
+/* without -O0 */
+void printtos()
+Before[0x00ffeff4]: 0x00000000
+After [0x00ffefec]: 0x00ffeff8
+	element[0x00ffefa0]: 0x0001a3b1
+	element[0x00ffefa4]: 0x00ffefa0
+	element[0x00ffefa8]: 0x00ffefa0
+	element[0x00ffefac]: 0x00000000
+

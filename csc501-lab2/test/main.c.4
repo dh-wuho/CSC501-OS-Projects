@@ -1,0 +1,47 @@
+#include <conf.h>
+#include <kernel.h>
+#include <proc.h>
+#include <stdio.h>
+#include <paging.h>
+
+
+#define PROC1_VADDR 0x40000000
+#define PROC1_VPNO      0x40000
+#define PROC2_VADDR     0x80000000
+#define PROC2_VPNO      0x80000
+#define TEST1_BS    1
+
+void proc1_test2(char *msg, int lck) {
+    //int *x;
+
+    kprintf("ready to allocate heap space\n");
+    /*
+    x = vgetmem(1024);
+    kprintf("heap allocated at %x\n", x);
+    *x = 100;
+    *(x + 1) = 200;
+
+    kprintf("heap variable: %d %d\n", *x, *(x + 1));
+    vfreemem(x, 1024);
+    */
+}
+
+int main() {
+
+    int pid2;
+    kprintf("\n2: vgetmem/vfreemem\n");
+    pid2 = vcreate(proc1_test2, 2000, 288, 20, "proc1_test2", 0, NULL);
+    if (pid2 == SYSERR) {
+        kprintf("vcreate failed\n");
+    } else {
+        kprintf("pid %d has private heap\n", pid2);
+        resume(pid2);
+    }
+    /*
+     * trying to map a private bs for bs 0 is allocated to process2
+    if (xmmap(PROC1_VPNO, 0, 100) == SYSERR) {
+        kprintf("error\n");
+    }
+    */
+    sleep(3);
+}

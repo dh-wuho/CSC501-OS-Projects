@@ -1,0 +1,16 @@
+1,What are the advantages and disadvantages of each of the two scheduling policies? Also, give the advantages and disadvantages of the round robin scheduling policy originally implemented in Xinu.
+
+I evaluate a scheduler by these aspects: CPU usage, turnaround time and response time.
+
+For Exponential Distribution Scheduler. The random value always is greater than 0, so the scheduler always could find a process to run if the ready queue is not empty. So this scheduler has has high CPU usage and CPU throught. 
+However, the turnaround time, waiting time and response time are bad in this scheduler. A process has to wait for a suitable random value so that it could run. So the turnaround time and response time are random, sometimes they are short, sometimes they are long. This may lead to starvation for some processes. Probabilistically speaking, the processes with lower priority have more chances to run, so they have shorter turnaround time and response time. For high priority processes, they have to wait for a long time to preempt CPU, and take a long period to finish their tasks.
+
+For Linux-like Scheduler, this is a relatively fair scheduling method. The process with low priority or a process doesn't execute in current epoch will increase their priority(goodness) in next epoch, so they have greater chance to execute. This will not lead to starvation. 
+But it is bad for some processes that need to response immediately. The change of priority only works in next epoch, so some real-time processes have to wait for the end of current epoch.
+
+The round-robin in original scheduler is simple to implement. You get the process from the tail of the ready queue, and insert the process so that it could be the first of the same priority processes. For example, A B C have the same priority 10, the ready queue will change like this: A-B-C -> C-A-B-> B-C-A -> A-B-C, then the round-robin finished.  The disadvantage of the round-robin is that if the processes in round-robin have highest priority, they will round-robin infinitely until they are killed or finished.
+
+2,Describe the way each of the schedulers affects the NULL process.
+
+For original scheduler and For Exponential Distribution Scheduler, the NULL process only will execute when the ready queue is empty.
+For Linux-like scheduler, besides the situation that the ready queue is empty, the NULL process will execute when the epoch doesn't end and the process in the ready queue are blocked.

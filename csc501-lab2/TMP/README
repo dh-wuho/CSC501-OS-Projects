@@ -1,0 +1,5 @@
+I believe I have implemented most functions that the assignment requires.
+
+Howeve, it still has some problems when several programs to stay in the memory. I wrote some test cases to test this program. For each single function, it works well, but when several functions are combined or several processes execute in parallel, there will be something wrong.
+
+I tried my best to debug it and it is really difficult and hard to debug. I have to say this drives me crazy. I have spent a lot of time on it, and I have a lot of other work to do. So, just be it....

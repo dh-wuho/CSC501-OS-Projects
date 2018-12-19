@@ -1,0 +1,69 @@
+1,
+1.1
+Priority inversion is a scenario in scheduling in which a high priority task is 
+indirectly preempted by a lower priority task effectively inverting the relative 
+priorities of the two tasks. 
+
+Here is a example:
+Consider processes A, B, C and a shared resource R, and we define: p(A) < p(B) < p(C), 
+where p(X) represents the priority for process X. At first, A gets shared resource R,
+then C preempts CPU and begins to run, and it also needs R. But now R is holded by A,
+so C is blocked. At this time, B is runnable and begins to execute. Because its priority
+is greater than A's, so A has to wait for B to complete, C has to wait for A to release
+R. In this case, even though C has the highest priority, it still is blocked by processes
+whose priorities are lower. So the priority is inversed here.
+
+Another solution
+We can use Priority Ceiling Protocol.
+The priority ceiling protocol is a synchronization protocol for shared resources to avoid 
+unbounded priority inversion and mutual deadlock due to wrong nesting of critical sections. 
+In this protocol each resource is assigned a priority ceiling, which is a priority equal to 
+the highest priority of any task which may lock the resource. The protocol works by temporarily 
+raising the priorities of tasks in certain situations, thus it requires a scheduler that 
+supports dynamic priority scheduling.
+
+Reference:
+https://en.wikipedia.org/wiki/Priority_inversion
+https://en.wikipedia.org/wiki/Priority_ceiling_protocol
+
+1.2
+Processes L, M, H, and their priorities subject to H > M > L. Here is the result:
+
+Test by using semaphores. --- BEGIN
+
+  L starts.
+  L to decrease sem.
+  L decreased semaphore.
+  H starts.
+  H to decrease sem.
+  M starts.
+  M holds cpu and ouputs itself.
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+  H decreased semaphore.
+
+Test by using semaphores. --- END
+
+
+Test by using locks. --- BEGIN
+
+  L starts.
+  L to acquire lock.
+  L acquired lock.
+  H starts.
+  H to acquire lock.
+  H acquired lock.
+  M starts.
+  M holds cpu and ouputs itself.
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+
+Test by using locks. --- END
+
+
+2,
+
+There are some writing operation in try_update, but this part is only proctected by READER lock, which
+allows several tasks to use some resources. So in this case, it is possible for global_buf to be changed
+by mutiple taks, causing synchronization failure.
+
+And here global_semaphore is initialized to 10, it means this part only allows at most 10 tasks to execute,
+When over 10 tasks to call this part, synchronization error. 
